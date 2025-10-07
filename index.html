@@ -1,228 +1,631 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Трекер 3 Личности</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-      max-width: 700px;
-      margin: auto;
-    }
-    button {
-      padding: 10px;
-      margin: 5px 0;
-      font-size: 1rem;
-    }
-    textarea, input {
-      width: 100%;
-      margin-bottom: 10px;
-      padding: 8px;
-      font-size: 1rem;
-    }
-    .idea, .row {
-      border: 1px solid #ccc;
-      padding: 8px;
-      margin-bottom: 10px;
-      border-radius: 6px;
-      background: #f9f9f9;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: auto auto auto auto auto auto auto;
-      gap: 6px;
-      font-size: 0.85rem;
-    }
-    .grid-header {
-      font-weight: bold;
-      background: #eee;
-    }
-  </style>
-</head>
-<body>
-  <h1>📅 Трекер 3 Личности</h1>
-  <div>
-    <button onclick="toggle('brain')">🧠 Предприниматель</button>
-    <button onclick="toggle('chart')">📊 Менеджер</button>
-    <button onclick="toggle('muscle')">💪 Специалист</button>
-  </div>
-  <input type="number" id="score" placeholder="Оценка дня (1–10)">
-  <textarea id="comment" placeholder="Комментарий"></textarea>
-  <button onclick="save()">💾 Сохранить</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Клуб «10k» — библиотека маркетинговых материалов</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: dark light;
+        --bg: #080810;
+        --bg-soft: rgba(17, 24, 39, 0.7);
+        --accent: linear-gradient(135deg, #ff4d8d, #9b4dff);
+        --accent-solid: #af52ff;
+        --text: #f8f8ff;
+        --text-soft: rgba(248, 248, 255, 0.7);
+        --card: rgba(255, 255, 255, 0.05);
+        --card-border: rgba(255, 255, 255, 0.12);
+      }
 
-  <div id="trackerTable"></div>
+      * {
+        box-sizing: border-box;
+      }
 
-  <hr style="margin: 40px 0;"/>
+      body {
+        margin: 0;
+        font-family: "Manrope", system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        background: radial-gradient(circle at top right, #1c1639, var(--bg));
+        color: var(--text);
+        line-height: 1.6;
+      }
 
-  <h2>💡 Идеи предпринимателя</h2>
-  <textarea id="newIdea" placeholder="Опиши идею или точку роста"></textarea>
-  <button onclick="addIdea()">➕ Добавить</button>
-  <button onclick="copyWeeklyPrompt()">📋 Копировать идеи за неделю</button>
-  <div id="ideaList"></div>
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
 
-  <script>
-    let selected = { brain: false, chart: false, muscle: false };
+      header {
+        padding: 64px 24px 120px;
+        position: relative;
+        overflow: hidden;
+      }
 
-    function toggle(key) {
-      selected[key] = !selected[key];
-      document.querySelectorAll('button').forEach(btn => {
-        if (btn.textContent.includes('🧠')) btn.style.background = selected.brain ? '#cdf' : '';
-        if (btn.textContent.includes('📊')) btn.style.background = selected.chart ? '#cdf' : '';
-        if (btn.textContent.includes('💪')) btn.style.background = selected.muscle ? '#cdf' : '';
-      });
-    }
+      header::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          120% 120% at 80% 10%,
+          rgba(255, 77, 141, 0.35) 0%,
+          rgba(155, 77, 255, 0.1) 35%,
+          transparent 65%
+        );
+        z-index: 0;
+      }
 
-    function save() {
-      const score = document.getElementById("score").value;
-      const comment = document.getElementById("comment").value;
-      if (!score) return alert("Укажи оценку");
+      .container {
+        width: min(1200px, 90vw);
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+      }
 
-      const date = new Date().toISOString().split("T")[0];
-      const data = JSON.parse(localStorage.getItem("threeRolesTracker") || "[]");
-      data.unshift({ date, ...selected, score, comment });
-      localStorage.setItem("threeRolesTracker", JSON.stringify(data));
-      document.getElementById("score").value = "";
-      document.getElementById("comment").value = "";
-      selected = { brain: false, chart: false, muscle: false };
-      renderTracker();
-      toggle(); // reset button styles
-    }
+      .hero {
+        display: grid;
+        gap: 32px;
+        max-width: 760px;
+      }
 
-    function renderTracker() {
-      const data = JSON.parse(localStorage.getItem("threeRolesTracker") || "[]");
-      const table = document.getElementById("trackerTable");
-      if (data.length === 0) return table.innerHTML = "<p>Записей пока нет.</p>";
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.08);
+        font-size: 0.9rem;
+        letter-spacing: 0.02em;
+      }
 
-      let html = '<div class="grid grid-header"><div>Дата</div><div>🧠</div><div>📊</div><div>💪</div><div>Оценка</div><div>Комментарий</div><div>Статус</div></div>';
-      data.forEach(row => {
-        const status = row.brain && row.chart && row.muscle ? '🔥' : (row.brain || row.chart || row.muscle ? '⚠' : '💤');
-        html += `<div class="grid row">
-          <div>${row.date}</div>
-          <div>${row.brain ? '✅' : ''}</div>
-          <div>${row.chart ? '✅' : ''}</div>
-          <div>${row.muscle ? '✅' : ''}</div>
-          <div>${row.score}</div>
-          <div>${row.comment}</div>
-          <div>${status}</div>
-        </div>`;
-      });
-      table.innerHTML = html;
-    }
+      h1 {
+        margin: 0;
+        font-size: clamp(2.5rem, 4vw + 1rem, 4.5rem);
+        font-weight: 800;
+        line-height: 1.1;
+      }
 
-    function loadIdeas() {
-      const saved = JSON.parse(localStorage.getItem("threeRolesIdeas") || "[]");
-      const ideaList = document.getElementById("ideaList");
-      ideaList.innerHTML = "";
-      saved.forEach(({ date, text }) => {
-        const el = document.createElement("div");
-        el.className = "idea";
-        el.innerHTML = `<div style='font-size:0.8rem;color:gray;'>${date}</div><div>${text}</div>`;
-        ideaList.appendChild(el);
-      });
-    }
+      .hero p {
+        margin: 0;
+        font-size: 1.15rem;
+        color: var(--text-soft);
+      }
 
-    function addIdea() {
-      const text = document.getElementById("newIdea").value.trim();
-      if (!text) return;
-      const saved = JSON.parse(localStorage.getItem("threeRolesIdeas") || "[]");
-      const date = new Date().toISOString().split("T")[0];
-      saved.unshift({ date, text });
-      localStorage.setItem("threeRolesIdeas", JSON.stringify(saved));
-      document.getElementById("newIdea").value = "";
-      loadIdeas();
-    }
+      .hero-cta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+      }
 
-    function copyWeeklyPrompt() {
-      const saved = JSON.parse(localStorage.getItem("threeRolesIdeas") || "[]");
-      const oneWeekAgo = new Date();
-      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-      const weekly = saved.filter(i => new Date(i.date) >= oneWeekAgo);
-      if (weekly.length === 0) return alert("За последнюю неделю идей нет.");
-      const list = weekly.map((i, idx) => `${idx + 1}. ${i.text}`).join("\n");
-      const prompt = `Вот мои идеи за неделю:\n\n${list}\n\nПроанализируй каждую по пунктам:\n1. Каков потенциал этой идеи?\n2. Насколько сложно её реализовать?\n3. Что нужно для запуска?\n4. Какие риски?\n5. Какие первые 3 шага?`;
-      navigator.clipboard.writeText(prompt);
-      alert("Скопировано! Открой ChatGPT и вставь.");
-    }
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px 28px;
+        border-radius: 14px;
+        font-weight: 600;
+        font-size: 1rem;
+        background: var(--accent);
+        box-shadow: 0 20px 40px rgba(155, 77, 255, 0.35);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
 
-    renderTracker();
-    loadIdeas();
-  </script>
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 26px 48px rgba(155, 77, 255, 0.45);
+      }
 
-<script>
-  // Добавим пояснение
-  const info = document.createElement("div");
-  info.innerHTML = `
-    <h3>📘 Как использовать трекер</h3>
-    <p>Ты — предприниматель, в котором живут три личности:</p>
-    <ul>
-      <li>🧠 <b>Предприниматель</b>: стратегия, идеи, масштаб</li>
-      <li>📊 <b>Менеджер</b>: организация, системность, делегирование</li>
-      <li>💪 <b>Специалист</b>: исполнение, работа руками</li>
-    </ul>
-    <p>🔥 = все три роли были активны · ⚠ = частично · 💤 = неактивный день</p>
-  `;
-  document.body.insertBefore(info, document.body.children[1]);
+      .btn-ghost {
+        padding: 14px 24px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        font-weight: 600;
+        transition: background 0.2s ease;
+      }
 
-  // Оценка дня — селект
-  const scoreInput = document.getElementById("score");
-  const scoreSelect = document.createElement("select");
-  scoreSelect.id = "score";
-  scoreSelect.innerHTML = "<option value=''>Оценка дня (1–10)</option>" +
-    Array.from({length: 10}, (_, i) => `<option value='${i+1}'>${i+1}</option>`).join("");
-  scoreInput.replaceWith(scoreSelect);
+      .btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.16);
+      }
 
-  // Удаление идеи
-  function deleteIdea(index) {
-    const saved = JSON.parse(localStorage.getItem("threeRolesIdeas") || "[]");
-    saved.splice(index, 1);
-    localStorage.setItem("threeRolesIdeas", JSON.stringify(saved));
-    loadIdeas();
-  }
+      .hero-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+        margin-top: 32px;
+      }
 
-  // Рендер идей с удалением
-  function loadIdeas() {
-    const saved = JSON.parse(localStorage.getItem("threeRolesIdeas") || "[]");
-    const container = document.getElementById("ideaList");
-    container.innerHTML = "";
-    saved.forEach(({ date, text }, index) => {
-      const div = document.createElement("div");
-      div.className = "idea";
-      div.innerHTML = `
-        <div style='font-size:0.8rem;color:gray;'>${date}</div>
-        <div>${text}</div>
-        <button onclick='deleteIdea(${index})'>🗑 Удалить</button>
-      `;
-      container.appendChild(div);
-    });
-  }
+      .stat {
+        padding: 16px 20px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(17, 24, 39, 0.55);
+        backdrop-filter: blur(12px);
+      }
 
-  // Анализ недели из трекера
-  function copyWeeklyTable() {
-    const data = JSON.parse(localStorage.getItem("threeRolesTracker") || "[]");
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-    const weekly = data.filter(i => new Date(i.date) >= oneWeekAgo);
-    if (weekly.length === 0) return alert("Нет данных за неделю.");
-    const rows = weekly.map(d =>
-      `${d.date}: 🧠 ${d.brain ? '✅' : '–'}, 📊 ${d.chart ? '✅' : '–'}, 💪 ${d.muscle ? '✅' : '–'}, Оценка: ${d.score}, Коммент: ${d.comment}`
-    ).join("\n");
-    const prompt = `Я использую трекер предпринимателя из книги Майкла Гербера. Каждый день я отмечаю, какая личность была активна: Предприниматель (🧠), Менеджер (📊), Специалист (💪). Вот мои записи за неделю:\n\n${rows}\n\nПроанализируй:\n1. Где я молодец?\n2. Что можно улучшить?\n3. Какие роли были недопредставлены?\n4. Как сбалансировать роли?\n5. Похвали и замотивируй меня.`;
-    navigator.clipboard.writeText(prompt);
-    alert("Скопировано! Вставь в ChatGPT.");
-  }
+      .stat-title {
+        display: block;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 8px;
+      }
 
-  // Добавим кнопку анализа под таблицу
-  const table = document.getElementById("trackerTable");
-  if (table) {
-    const btn = document.createElement("button");
-    btn.textContent = "📋 Анализ недели с промптом";
-    btn.onclick = copyWeeklyTable;
-    btn.style.margin = "20px 0";
-    table.insertAdjacentElement("afterend", btn);
-  }
-</script>
-</body>
+      .stat-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+      }
 
+      section {
+        padding: 88px 0;
+        position: relative;
+      }
+
+      section:nth-of-type(even) {
+        background: rgba(8, 8, 16, 0.75);
+      }
+
+      h2 {
+        font-size: clamp(2rem, 3vw + 1rem, 3.2rem);
+        margin-bottom: 24px;
+        font-weight: 700;
+        line-height: 1.2;
+      }
+
+      .pill-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin: 24px 0 0;
+      }
+
+      .pill {
+        padding: 10px 18px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.08);
+        font-size: 0.95rem;
+        font-weight: 500;
+      }
+
+      .grid-2 {
+        display: grid;
+        gap: 32px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+
+      .grid-3 {
+        display: grid;
+        gap: 24px;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      }
+
+      .card {
+        position: relative;
+        padding: 32px;
+        border-radius: 24px;
+        background: var(--card);
+        border: 1px solid var(--card-border);
+        backdrop-filter: blur(14px);
+        transition: transform 0.2s ease, border-color 0.2s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-6px);
+        border-color: rgba(255, 255, 255, 0.28);
+      }
+
+      .card h3 {
+        margin: 0 0 12px;
+        font-size: 1.3rem;
+        font-weight: 700;
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--text-soft);
+      }
+
+      .card strong {
+        color: #fff;
+      }
+
+      .checklist {
+        display: grid;
+        gap: 14px;
+        margin-top: 24px;
+      }
+
+      .check-item {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .check-item span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: rgba(82, 255, 183, 0.16);
+        border: 1px solid rgba(82, 255, 183, 0.35);
+        font-size: 1rem;
+      }
+
+      .spotlight {
+        padding: 40px;
+        border-radius: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: linear-gradient(135deg, rgba(255, 77, 141, 0.2), rgba(17, 24, 39, 0.8));
+        backdrop-filter: blur(18px);
+        margin-top: 32px;
+      }
+
+      .spotlight h3 {
+        margin-top: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+
+      .divider {
+        margin: 64px 0 48px;
+        text-align: center;
+        position: relative;
+      }
+
+      .divider::before,
+      .divider::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        width: 38%;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .divider::before {
+        left: 0;
+      }
+
+      .divider::after {
+        right: 0;
+      }
+
+      .divider span {
+        padding: 0 12px;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.22em;
+        color: rgba(255, 255, 255, 0.55);
+      }
+
+      .testimonials {
+        display: grid;
+        gap: 24px;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      }
+
+      .testimonial {
+        padding: 24px;
+        border-radius: 20px;
+        background: rgba(17, 24, 39, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        display: grid;
+        gap: 14px;
+      }
+
+      .testimonial img {
+        width: 100%;
+        border-radius: 16px;
+        object-fit: cover;
+        aspect-ratio: 16 / 9;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .testimonial strong {
+        font-size: 1rem;
+      }
+
+      .list-numbered {
+        counter-reset: list;
+        display: grid;
+        gap: 18px;
+      }
+
+      .list-numbered li {
+        list-style: none;
+        counter-increment: list;
+        padding: 20px;
+        background: rgba(17, 24, 39, 0.65);
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      .list-numbered li::before {
+        content: "0" counter(list);
+        font-weight: 700;
+        margin-right: 12px;
+        color: rgba(255, 255, 255, 0.45);
+        letter-spacing: 0.08em;
+      }
+
+      .cta {
+        text-align: center;
+        padding: 96px 0 120px;
+      }
+
+      .cta h2 {
+        margin-bottom: 16px;
+      }
+
+      .cta p {
+        margin: 0 auto 32px;
+        max-width: 620px;
+        color: var(--text-soft);
+      }
+
+      footer {
+        padding: 32px 24px 48px;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(5, 5, 10, 0.95);
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.85rem;
+        text-align: center;
+      }
+
+      @media (max-width: 720px) {
+        header {
+          padding: 48px 20px 80px;
+        }
+        .hero-stats {
+          gap: 12px;
+        }
+        .card {
+          padding: 24px;
+        }
+        .spotlight {
+          padding: 28px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <div class="hero">
+          <span class="badge">🎁 Лучший подарок для онлайн-экспертов</span>
+          <h1>Бесплатный доступ к библиотеке маркетинга стоимостью $12&nbsp;750</h1>
+          <p>
+            Станьте резидентом клуба «10k», подключите готовую экосистему знаний,
+            чтобы выйти на личный доход до $10&nbsp;000 в месяц в любой нише —
+            без эзотерики, без команды и даже если начинаете с нуля.
+          </p>
+          <div class="hero-cta">
+            <a href="#join" class="btn-primary">Присоединиться к клубу «10k»</a>
+            <a href="#library" class="btn-ghost">Посмотреть, что внутри</a>
+          </div>
+          <div class="hero-stats">
+            <div class="stat">
+              <span class="stat-title">Общая стоимость</span>
+              <span class="stat-value">$12 750 → 0 ₽</span>
+            </div>
+            <div class="stat">
+              <span class="stat-title">Цель клуба</span>
+              <span class="stat-value">$10k/мес за 12 месяцев</span>
+            </div>
+            <div class="stat">
+              <span class="stat-title">Ниша</span>
+              <span class="stat-value">Любая экспертиза</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section id="promise">
+      <div class="container grid-2">
+        <div>
+          <h2>Одна цель — один год — одна воронка — одна аудитория — одно решение</h2>
+          <p>
+            Клуб «10k» создан для экспертов и наставников, которые хотят системно
+            расти и строить доход на своих знаниях. Вы получаете обучающие
+            материалы, комьюнити и поддержку, чтобы выстроить прибыльную воронку,
+            масштабировать продажи и закрепиться в статусе востребованного
+            эксперта.
+          </p>
+          <div class="pill-list">
+            <span class="pill">Без психологии</span>
+            <span class="pill">Без эзотерики</span>
+            <span class="pill">Без команды</span>
+            <span class="pill">Без воды</span>
+          </div>
+        </div>
+        <div class="spotlight">
+          <h3>Когда вы становитесь резидентом:</h3>
+          <div class="checklist">
+            <div class="check-item">
+              <span>⚡</span>
+              <div>Получаете мгновенный доступ к базе курсов, чек-листов и шаблонов.</div>
+            </div>
+            <div class="check-item">
+              <span>📈</span>
+              <div>Закрываете пробелы в маркетинге, продажах, трафике и упаковке.</div>
+            </div>
+            <div class="check-item">
+              <span>🤝</span>
+              <div>Оказываетесь в окружении практиков, которые двигаются к $10k вместе с вами.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="library">
+      <div class="container">
+        <h2>Вот что вы получаете сразу после подписки</h2>
+        <p style="color: var(--text-soft); max-width: 680px;">
+          Каждый материал в библиотеке — это концентрат практики американских
+          маркетологов. Мы собрали ключевые инструменты, которые помогают
+          экспертам быстро собирать аудиторию, создавать мощные офферы и запускать
+          прибыльные воронки продаж.
+        </p>
+        <div class="grid-3" style="margin-top: 48px;">
+          <article class="card">
+            <h3>Секреты эффективных воронок</h3>
+            <p>Закрытый эфир с тремя факторами успеха любого продвижения, которые устраняют провалы в продажах.</p>
+          </article>
+          <article class="card">
+            <h3>Стратегия запуска подписных бизнесов</h3>
+            <p>Схема модели The Linchpin, которая сейчас внедряется в США и помогает строить предсказуемый доход.</p>
+          </article>
+          <article class="card">
+            <h3>Фронтенд-воронка</h3>
+            <p>Экспресс-курс по системе прогрева холодной аудитории через доступные продукты без рекламного бюджета.</p>
+          </article>
+          <article class="card">
+            <h3>Три американских инструмента</h3>
+            <p>Разбор сервисов, которые помогают собрать аудиторию и сделать первые продажи с нуля.</p>
+          </article>
+          <article class="card">
+            <h3>Комплект промптов для ChatGPT</h3>
+            <p>Готовые сценарии исследования аудитории и создания аватара клиента за 60 минут.</p>
+          </article>
+          <article class="card">
+            <h3>Дополнительные каналы трафика</h3>
+            <p>Запись выступления с тремя бесплатными источниками трафика, о которых не говорят публично.</p>
+          </article>
+          <article class="card">
+            <h3>Формула сильного оффера</h3>
+            <p>Структура, которая приводит 3+ клиентов на высокий чек всего из одного поста.</p>
+          </article>
+          <article class="card">
+            <h3>Секреты трафика, экспертов и воронок</h3>
+            <p>Видеоразборы книг Traffic Secrets, Expert Secrets и Dotcom Secrets — более 60 видео.</p>
+          </article>
+          <article class="card">
+            <h3>One Funnel Away Challenge</h3>
+            <p>Русский перевод легендарного воркшопа Рассела Брансона — 100+ видео по запуску воронок.</p>
+          </article>
+          <article class="card">
+            <h3>Структуры для продаж</h3>
+            <p>Готовые структуры для вебинара, истории, страницы, поста, видео и лид-магнита.</p>
+          </article>
+          <article class="card">
+            <h3>Финансовые инструменты</h3>
+            <p>Таблица окупаемости воронки и список обязательных сервисов для запуска.</p>
+          </article>
+          <article class="card">
+            <h3>Секреты продающего текста</h3>
+            <p>Формула, которая помогает писать все тексты воронки быстро и без мучительных правок.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="divider"><span>Социальное доказательство</span></div>
+        <h2>Результаты резидентов клуба</h2>
+        <p style="color: var(--text-soft); max-width: 660px;">
+          Скриншоты отзывов и цифры роста сообщества «10k». Замените плейсхолдеры
+          на реальные результаты ваших резидентов — это усилит доверие и скорость
+          принятия решения.
+        </p>
+        <div class="testimonials" style="margin-top: 40px;">
+          <article class="testimonial">
+            <img src="https://placehold.co/600x338/1c1639/FFFFFF?text=Отзыв+1" alt="Скриншот отзыва 1" />
+            <div>
+              <strong>+480% к обороту за 90 дней</strong>
+              <p>«Благодаря библиотеке и мастермайндам я закрыла пробелы в воронке и вышла на $12k в месяц».</p>
+            </div>
+          </article>
+          <article class="testimonial">
+            <img src="https://placehold.co/600x338/1c1639/FFFFFF?text=Отзыв+2" alt="Скриншот отзыва 2" />
+            <div>
+              <strong>300 новых клиентов с холодного трафика</strong>
+              <p>«Промпты и шаблоны позволили протестировать новую нишу без бюджета и получить поток заявок».</p>
+            </div>
+          </article>
+          <article class="testimonial">
+            <img src="https://placehold.co/600x338/1c1639/FFFFFF?text=Отзыв+3" alt="Скриншот отзыва 3" />
+            <div>
+              <strong>$10k чистыми спустя 6 месяцев</strong>
+              <p>«Комьюнити держит в тонусе, а ежемесячные практикумы помогают внедрять новые инструменты».</p>
+            </div>
+          </article>
+          <article class="testimonial">
+            <img src="https://placehold.co/600x338/1c1639/FFFFFF?text=Отзыв+4" alt="Скриншот отзыва 4" />
+            <div>
+              <strong>Рост подписчиков ×6</strong>
+              <p>«Сделал первый Reels по структуре из библиотеки и получил более 50 заявок на консультации».</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container grid-2">
+        <div>
+          <h2>Что вас ждет внутри клуба</h2>
+          <ul class="list-numbered">
+            <li><strong>Ежемесячные мастер-классы.</strong> Глубокие разборы ключевых навыков маркетинга и продаж.</li>
+            <li><strong>Ежемесячные практикумы.</strong> Совместная работа и внедрение знаний с обратной связью.</li>
+            <li><strong>Ежемесячные мастермайнды.</strong> Закрытое окружение практиков для роста через обмен опытом.</li>
+            <li><strong>Большая база знаний.</strong> Структурированные уроки и видеотеки по всем направлениям.</li>
+            <li><strong>База готовых файлов.</strong> Шаблоны документов, воронок, сценариев и рекламных материалов.</li>
+            <li><strong>Отзывчивое сообщество.</strong> Постоянная поддержка и ответы на вопросы 24/7.</li>
+            <li><strong>Партнерская программа.</strong> Зарабатывайте, приглашая друзей и коллег в клуб.</li>
+          </ul>
+        </div>
+        <div class="spotlight">
+          <h3>План действий:</h3>
+          <div class="checklist">
+            <div class="check-item">
+              <span>1</span>
+              <div>Оставьте заявку и подтвердите участие в клубе.</div>
+            </div>
+            <div class="check-item">
+              <span>2</span>
+              <div>Получите мгновенный доступ к библиотеке и контенту.</div>
+            </div>
+            <div class="check-item">
+              <span>3</span>
+              <div>Следуйте дорожной карте, чтобы выйти на стабильные $10k в месяц.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta" id="join">
+      <div class="container">
+        <h2>Готовы забрать лучшие маркетинговые материалы бесплатно?</h2>
+        <p>
+          Оформите подписку на клуб «10k» и получите полный доступ к библиотеке,
+          мастер-классам, практикумам и сообществу, которое поддержит вас на пути
+          к $10&nbsp;000 личного дохода каждый месяц.
+        </p>
+        <div class="hero-cta" style="justify-content: center;">
+          <a href="#" class="btn-primary">Стать резидентом клуба</a>
+          <a href="#promise" class="btn-ghost">Узнать подробнее о формате</a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      Клуб «10k» · 2024 · Все права защищены. Подключайтесь и растите свой онлайн-бизнес вместе с нами.
+    </footer>
+  </body>
 </html>
